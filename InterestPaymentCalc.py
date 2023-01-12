@@ -1,5 +1,6 @@
 import pyfiglet
 from calendar import monthrange
+import sys
 
 
 
@@ -21,13 +22,12 @@ def determineMonthBalance(interest, balance, payment):
 
     return total
 
-def displayInfo(total, interest, payment):
-    currentYear = 2023
-    currentMonth = 1
+def displayInfo(total, interest, payment, currentMonth, currentYear):
     while total > 0:
         daysInMonth = monthrange(currentYear, currentMonth)[1]
         i = calculateInterest(interest, total)
         interestPayment = calculateMonthlyInterestRate(i,daysInMonth)
+        
         monthlyBalance.append(total)
         monthlyInterest.append(interestPayment)
         total = determineMonthBalance(interestPayment, total, payment)
@@ -55,25 +55,39 @@ def getsumofInterest(monthlyInterest):
 
     return round(t, 2) 
 
+cont = True
+while cont == True:
+    currentYear = 2023
+    currentMonth = 1
+    daysInMonth = monthrange(currentYear, currentMonth)[1]
+    monthlyBalance = []
+    monthlyInterest = []
+    text = "Interest Calculator!"
 
-monthlyBalance = []
-monthlyInterest = []
-text = "Interest Calculator!"
+    ascii_text = pyfiglet.figlet_format(text)
 
-ascii_text = pyfiglet.figlet_format(text)
+    print(ascii_text)
 
-print(ascii_text)
+    total = float(input("How much do you owe: "))
+    interest = float(input("Please enter your interest rate: "))
+    payment = float(input("How much do you pay a month: "))
+    interestPayment = calculateMonthlyInterestRate(calculateInterest(interest, total),daysInMonth)
+    if interestPayment > payment:
+            print("Your payments are not enough to cover the accumulated interest. Try increasing the payments.")
+            wait = input("Please press enter to continue...\n")
+            continue
+    else:
+        displayInfo(total, interest, payment, currentMonth, currentYear)
+        print(f"Total interest paid: ${getsumofInterest(monthlyInterest)}")
 
-total = float(input("How much do you owe: "))
-interest = float(input("Please enter your interest rate: "))
-payment = float(input("How much do you pay a month: "))
+        checkCsv = input("\nWould you like a .csv file to be generated? y/n: ")
 
-displayInfo(total, interest, payment)
-print(f"Total interest paid: ${getsumofInterest(monthlyInterest)}")
+        if checkCsv.lower() == 'y':
+            createCSV(monthlyBalance, monthlyInterest)
+        else:
+            print("\nOkay, thanks!")
 
-checkCsv = input("\nWould you like a .csv file to be generated? y/n: ")
-
-if checkCsv.lower() == 'y':
-    createCSV(monthlyBalance, monthlyInterest)
-else:
-    print("\nOkay, thanks!")
+        
+        c = input("Would you like to continue? y/n: ")
+        if c.lower() == 'n':
+            cont = False
